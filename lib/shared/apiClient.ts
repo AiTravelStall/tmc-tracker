@@ -22,6 +22,8 @@ async function request<T>(method: string, url: string, body?: unknown): Promise<
   const data = await res.json().catch(() => null);
   if (!res.ok) {
     const err = (data ?? {}) as Partial<ApiError>;
+    // Session expired: a full reload on purpose, so no stale client state survives the sign-out.
+    // eslint-disable-next-line @next/next/no-location-assign-relative-destination -- not a component; no router here
     if (res.status === 401 && typeof window !== 'undefined') window.location.assign('/login');
     throw new ClientApiError(err.code ?? 'INTERNAL', err.message ?? `Request failed (${res.status})`, res.status, err.details);
   }
