@@ -1,5 +1,9 @@
 import { bindings, defineConfig, defineWorker } from "cf/config";
 
+// Workers Builds (CI) sets WORKERS_CI. Locally the secrets are declared so they load from .env.local
+// and missing ones are flagged; in CI they are not, so a fresh Worker can deploy before its secrets exist.
+const declareSecrets = !process.env.WORKERS_CI;
+
 export default defineConfig({
   worker: defineWorker({
     name: "tmc-tracker",
@@ -12,12 +16,14 @@ export default defineConfig({
       notFoundHandling: "none",
       runWorkerFirst: ["/*", "!/_next/static/*", "!/*/_next/static/*"],
     },
+    // Supabase values are Worker secrets, added in the dashboard (Settings → Variables and Secrets)
+    // or with `cf workers secrets update`. lib/server/env.ts reports any missing at runtime.
+    // Never commit their values.
     env: {
       ASSETS: bindings.assets(),
-      // Set with `cf workers secrets put` (production) or .env.local (local preview). Never commit values.
-      NEXT_PUBLIC_SUPABASE_URL: bindings.secret(),
-      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: bindings.secret(),
-      SUPABASE_SECRET_KEY: bindings.secret(),
+      NEXT_PUBLIC_SUPABASE_URL: declareSecrets && bindings.secret(),
+      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: declareSecrets && bindings.secret(),
+      SUPABASE_SECRET_KEY: declareSecrets && bindings.secret(),
       NEXT_PUBLIC_APP_TIMEZONE: bindings.text("Asia/Kolkata"),
     },
   }),
