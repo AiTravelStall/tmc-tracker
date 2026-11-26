@@ -10,3 +10,6 @@ next-env.d.ts
 
 # Research list with personal contact details: never commit (repo is public)
 data/seed/*.csv
+/dist/
+.vinext/
+.cloudflare/
