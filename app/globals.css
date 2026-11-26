@@ -1,0 +1,123 @@
+@import 'tailwindcss';
+
+/* TMC design tokens (design doc §12). Components use these utilities, never raw hex. */
+@theme inline {
+  /* Brand */
+  --color-tmc-cyan: #1aafe0;        /* accents, large display highlights, focus ring base */
+  --color-tmc-cyan-bright: #1ab9ed; /* hover / focus ring */
+  --color-tmc-cyan-deep: #0e7fa6;   /* body-size links, primary buttons (4.6:1 on white) */
+  --color-tmc-cyan-wash: #e6f6fb;   /* icon containers, selected fills */
+  --color-tmc-navy: #000442;        /* app chrome, headings */
+  --color-tmc-anchor: #0e0e0e;      /* primary text */
+  --color-tmc-charcoal: #3f3f3f;    /* secondary text */
+  --color-tmc-slate: #475569;       /* muted text */
+  --color-tmc-border: #e2e8f0;
+  --color-tmc-border-strong: #cbd5e1; /* hover borders, control outlines */
+  --color-tmc-mist: #f2f4f6;        /* page background, dividers */
+  --color-tmc-canvas: #f5f7fa;      /* app page background */
+  --color-tmc-navy-soft: #0b1259;   /* raised surfaces on navy chrome */
+  --color-tmc-subtle: #f8fafc;      /* subtle surfaces, table headers */
+  --color-tmc-white: #ffffff;
+
+  /* Semantic (status colours are reserved for state; always paired with a label) */
+  --color-tmc-success: #16a34a;
+  --color-tmc-success-ink: #166534;
+  --color-tmc-success-wash: #dcfce7;
+  --color-tmc-warning: #d97706;
+  --color-tmc-warning-ink: #92400e;
+  --color-tmc-warning-wash: #fef3c7;
+  --color-tmc-error: #d93025;
+  --color-tmc-error-ink: #991b1b;
+  --color-tmc-error-wash: #fee2e2;
+  --color-tmc-info-ink: #075985;
+  --color-tmc-info-wash: #e0f2fe;
+  --color-tmc-violet-ink: #4338ca;
+  --color-tmc-violet-wash: #e0e7ff;
+
+  /* Data viz: one series hue */
+  --color-tmc-series-1: #2a78d6;
+
+  /* Type */
+  --font-sans: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-staatliches), var(--font-dm-sans), sans-serif;
+  --text-display: clamp(28px, 2vw + 16px, 40px);
+  --text-display--line-height: 1.05;
+  --text-h2: clamp(22px, 1vw + 16px, 28px);
+  --text-h2--line-height: 1.15;
+  --text-label: 12px;
+  --text-label--line-height: 1.4;
+  --text-label--letter-spacing: 0.08em;
+  --text-small: 13px;
+  --text-small--line-height: 1.5;
+
+  /* Radius & elevation */
+  --radius-control: 10px;
+  --radius-button: 14px;
+  --radius-card: 24px;
+  --radius-panel: 16px;             /* in-app panels: tighter than marketing cards */
+  --shadow-card: 0 1px 2px rgb(0 4 66 / 0.04), 0 1px 1px rgb(0 4 66 / 0.03);
+  --shadow-raised: 0 1px 2px rgb(0 4 66 / 0.05), 0 4px 12px -4px rgb(0 4 66 / 0.08);
+  --shadow-overlay: 0 24px 48px -12px rgb(0 4 66 / 0.28);
+}
+
+@layer base {
+  html { color-scheme: light; }
+  body {
+    @apply bg-tmc-canvas font-sans text-[15px] leading-[1.55] text-tmc-anchor antialiased;
+  }
+  a { @apply text-tmc-cyan-deep underline-offset-2 hover:underline; }
+  :focus-visible { outline: 3px solid var(--color-tmc-cyan-bright); outline-offset: 2px; }
+  ::selection { background: var(--color-tmc-cyan-wash); }
+}
+
+/* Form controls share one look; FormField wires labels and errors. */
+@layer components {
+  .tmc-input {
+    @apply min-h-11 w-full rounded-control border border-tmc-border bg-tmc-white px-3.5 py-2 text-[15px] text-tmc-anchor
+      shadow-[0_1px_1px_rgb(0_4_66/0.03)] transition-[border-color,box-shadow] duration-150
+      placeholder:text-tmc-slate/70 hover:border-tmc-border-strong
+      focus:border-tmc-cyan-deep focus:outline-none focus:ring-4 focus:ring-tmc-cyan-wash
+      disabled:cursor-not-allowed disabled:bg-tmc-subtle disabled:text-tmc-slate aria-invalid:border-tmc-error aria-invalid:focus:ring-tmc-error-wash;
+  }
+  textarea.tmc-input { @apply min-h-0 resize-y leading-relaxed; }
+  select.tmc-input {
+    @apply cursor-pointer appearance-none bg-no-repeat pr-10;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%23475569' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' viewBox='0 0 24 24'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-position: right 12px center;
+  }
+  input[type='datetime-local'].tmc-input { @apply tabular-nums; }
+  .tmc-label { @apply font-semibold uppercase text-label tracking-[0.08em] text-tmc-slate; }
+  .tmc-checkbox {
+    @apply size-[18px] cursor-pointer rounded-[5px] border-tmc-border-strong accent-tmc-cyan-deep;
+  }
+}
+
+/* FullCalendar, themed with tokens. */
+.fc {
+  --fc-border-color: var(--color-tmc-border);
+  --fc-today-bg-color: var(--color-tmc-cyan-wash);
+  --fc-button-bg-color: var(--color-tmc-white);
+  --fc-button-text-color: var(--color-tmc-anchor);
+  --fc-button-border-color: var(--color-tmc-border);
+  --fc-button-hover-bg-color: var(--color-tmc-subtle);
+  --fc-button-hover-border-color: var(--color-tmc-border);
+  --fc-button-active-bg-color: var(--color-tmc-navy);
+  --fc-button-active-border-color: var(--color-tmc-navy);
+  --fc-now-indicator-color: var(--color-tmc-error);
+  font-size: 13px;
+}
+.fc .fc-button { font-weight: 600; text-transform: none; box-shadow: none !important; border-radius: var(--radius-control); }
+.fc .fc-button-primary:not(:disabled).fc-button-active { color: var(--color-tmc-white); }
+.fc .fc-toolbar-title { font-family: var(--font-display); font-size: 26px; font-weight: 400; letter-spacing: 0.02em; color: var(--color-tmc-navy); }
+.fc .fc-col-header-cell-cushion { font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--color-tmc-slate); }
+.fc-event { cursor: pointer; }
+.fc .ev-cancelled { text-decoration: line-through; opacity: 0.7; }
+.fc-daygrid-event { white-space: normal; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+}
+
+@keyframes toast-in { from { transform: translateY(8px); opacity: 0; } }
+@keyframes reveal { from { transform: translateY(-4px); opacity: 0; } }
+.tmc-reveal { animation: reveal 180ms cubic-bezier(0.2, 0, 0, 1); }

@@ -1,0 +1,12 @@
+node_modules
+.next
+out
+coverage
+.env*.local
+.env
+*.tsbuildinfo
+next-env.d.ts
+.DS_Store
+
+# Research list with personal contact details: never commit (repo is public)
+data/seed/*.csv
