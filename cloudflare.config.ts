@@ -32,7 +32,8 @@ export default defineConfig({
       SALESTRAIL_API_PASSWORD: declareSecrets && bindings.secret(),
       GROQ_API_KEY: declareSecrets && bindings.secret(),
       AI: bindings.ai(), // Workers AI: free fallback transcription
-      NEXT_PUBLIC_APP_TIMEZONE: bindings.text("Asia/Kolkata"),
+      // NEXT_PUBLIC_APP_TIMEZONE is not declared: the app defaults to Asia/Kolkata, and a dashboard
+      // secret of the same name would clash with a declared value and abort the deploy.
     },
   }),
 });
