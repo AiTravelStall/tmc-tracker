@@ -1,5 +1,7 @@
 # TMC Tracker
 
+## Date -> 27/11/2026
+
 School outreach tracker for The Modern Classroom. Telemarketers call schools from the research list and either book a sales visit or set a follow-up call. Sales people work from a calendar of visits booked for them, and admins see the whole pipeline.
 
 **Stack:** Next.js 16 (App Router) · TypeScript (strict) · Tailwind v4 with TMC design tokens · Supabase (Postgres, Auth, Row Level Security) · Zod · Vitest. Built to the conventions in the TMC system design document.
