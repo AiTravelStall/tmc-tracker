@@ -17,6 +17,22 @@ let cached: Env | null = null;
 
 export class EnvError extends Error {}
 
+// Call recordings (Salestrail + transcription). Optional: the app runs without them and the
+// Recordings page explains what to set. Kept apart from `env()` so a missing key never breaks sign-in.
+const integrationSchema = z.object({
+  SALESTRAIL_API_USERNAME: z.string().min(1),
+  SALESTRAIL_API_PASSWORD: z.string().min(1),
+  GROQ_API_KEY: z.string().min(1).optional(),
+  CRON_SECRET: z.string().min(24),
+});
+export type IntegrationEnv = z.infer<typeof integrationSchema>;
+
+/** Salestrail settings, or null when the integration is not configured yet. */
+export function integrationEnv(): IntegrationEnv | null {
+  const parsed = integrationSchema.safeParse(process.env);
+  return parsed.success ? parsed.data : null;
+}
+
 export function env(): Env {
   if (cached) return cached;
   const parsed = schema.safeParse(process.env);

@@ -1,4 +1,4 @@
-import type { CallOutcome, MeetingOutcome, MeetingStatus, Role, SchoolStatus } from '@/types/domain';
+import type { CallOutcome, MeetingOutcome, MeetingStatus, Role, SchoolStatus, TranscriptStatus } from '@/types/domain';
 
 export const ROLE_LABEL: Record<Role, string> = { admin: 'Admin', telemarketer: 'Telemarketer', sales: 'Sales' };
 
@@ -50,3 +50,14 @@ export const CALL_OUTCOME_TONE: Record<CallOutcome, Tone> = {
   meeting_scheduled: 'success', interested: 'brand', follow_up: 'warning',
   not_reachable: 'neutral', not_interested: 'danger', wrong_number: 'danger',
 };
+
+export const TRANSCRIPT_STATUS_LABEL: Record<TranscriptStatus, string> = {
+  pending: 'Transcribing', done: 'Transcript ready', no_recording: 'No recording', skipped: 'Not answered', failed: 'Transcript failed',
+};
+export const TRANSCRIPT_STATUS_TONE: Record<TranscriptStatus, Tone> = {
+  pending: 'info', done: 'success', no_recording: 'neutral', skipped: 'neutral', failed: 'danger',
+};
+
+/** Whisper reports languages as ISO codes or English names; show a friendly name. */
+const LANGUAGES: Record<string, string> = { en: 'English', hi: 'Hindi', kn: 'Kannada', ta: 'Tamil', te: 'Telugu', ml: 'Malayalam', mr: 'Marathi', bn: 'Bengali', ur: 'Urdu' };
+export const languageLabel = (v: string | null) => (v ? LANGUAGES[v.toLowerCase()] ?? v.charAt(0).toUpperCase() + v.slice(1) : null);

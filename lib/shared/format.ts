@@ -52,3 +52,10 @@ export const pct = (a: number, b: number) => (b ? `${Math.round((a / b) * 100)}%
 
 /** For server components, which render once per request. Client components use useNow(). */
 export const isPast = (iso: string, at: number = Date.now()) => new Date(iso).getTime() < at;
+
+/** 75 → "1:15", 3725 → "1:02:05". */
+export function fmtDuration(seconds: number): string {
+  const s = Math.max(0, Math.round(seconds));
+  const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), r = String(s % 60).padStart(2, '0');
+  return h ? `${h}:${String(m).padStart(2, '0')}:${r}` : `${m}:${r}`;
+}

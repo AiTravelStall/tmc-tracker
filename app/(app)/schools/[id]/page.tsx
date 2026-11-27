@@ -1,10 +1,11 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { BellRing, Building2, CalendarCheck, ChevronLeft, ChevronRight, PhoneCall, UsersRound } from 'lucide-react';
+import { AudioLines, BellRing, Building2, CalendarCheck, ChevronLeft, ChevronRight, PhoneCall, UsersRound } from 'lucide-react';
 import { requirePageUser } from '@/lib/server/auth';
 import { getSchoolDetail } from '@/lib/server/data/schools';
 import { listDirectory } from '@/lib/server/data/users';
+import { listRecordings } from '@/lib/server/data/recordings';
 import { AppError } from '@/lib/server/errors';
 import { fmtDateTime } from '@/lib/shared/format';
 import { cn } from '@/lib/shared/cn';
@@ -20,6 +21,7 @@ import { FollowUpItem } from '@/components/sections/school/FollowUpItem';
 import { HistoryTabs } from '@/components/sections/school/HistoryTabs';
 import { SchoolAdminControls } from '@/components/sections/school/SchoolAdminControls';
 import { MeetingDialogFromUrl } from '@/components/sections/meetings/MeetingDialogFromUrl';
+import { RecordingsTable } from '@/components/sections/recordings/RecordingsTable';
 
 type Props = { params: Promise<{ id: string }>; searchParams: Promise<{ contact?: string }> };
 
@@ -42,7 +44,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function SchoolPage({ params, searchParams }: Props) {
   const user = await requirePageUser();
   const [{ id }, { contact }] = await Promise.all([params, searchParams]);
-  const [detail, directory] = await Promise.all([load(id), listDirectory()]);
+  const [detail, directory, recordings] = await Promise.all([load(id), listDirectory(), listRecordings({ schoolId: Number(id), limit: 10 })]);
   const { school, contacts, calls, followUps, meetings, activities } = detail;
   const canCall = user.role !== 'sales';
   const salesPeople = directory.filter((u) => u.role === 'sales');
@@ -114,6 +116,14 @@ export default async function SchoolPage({ params, searchParams }: Props) {
           <Card aria-label="History">
             <HistoryTabs calls={calls} meetings={meetings} followUps={followUps} activities={activities} showFollowUps={canCall} />
           </Card>
+
+          {recordings.length > 0 && (
+            <Card flush aria-labelledby="school-recordings">
+              <CardHeader padded id="school-recordings" icon={<AudioLines />} title={`Call recordings (${recordings.length}${recordings.length === 10 ? '+' : ''})`}
+                description="Salestrail calls to this school's numbers." />
+              <RecordingsTable calls={recordings} showCaller={user.role === 'admin'} showSchool={false} />
+            </Card>
+          )}
         </div>
 
         <div className="flex flex-col gap-5 xl:sticky xl:top-8">

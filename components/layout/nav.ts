@@ -1,4 +1,4 @@
-import { ArrowLeftRight, BellRing, CalendarDays, LayoutDashboard, MapPin, School, ScrollText, Sun, Users, type LucideIcon } from 'lucide-react';
+import { ArrowLeftRight, AudioLines, BellRing, CalendarDays, LayoutDashboard, MapPin, School, ScrollText, Sun, Users, type LucideIcon } from 'lucide-react';
 import type { Role } from '@/types/domain';
 
 export type NavItem = { href: string; label: string; icon: LucideIcon; badge?: boolean; group?: 'admin' };
@@ -10,6 +10,7 @@ export const NAV: Record<Role, NavItem[]> = {
     { href: '/followups', label: 'Follow-ups', icon: BellRing, badge: true },
     { href: '/calendar', label: 'Calendar', icon: CalendarDays },
     { href: '/meetings', label: 'Visits', icon: MapPin },
+    { href: '/recordings', label: 'Recordings', icon: AudioLines },
     { href: '/activity', label: 'Activity log', icon: ScrollText, group: 'admin' },
     { href: '/team', label: 'Team', icon: Users, group: 'admin' },
     { href: '/data', label: 'Import / Export', icon: ArrowLeftRight, group: 'admin' },
@@ -20,10 +21,12 @@ export const NAV: Record<Role, NavItem[]> = {
     { href: '/followups', label: 'Follow-ups', icon: BellRing, badge: true },
     { href: '/calendar', label: 'Sales calendar', icon: CalendarDays },
     { href: '/meetings', label: 'Visits', icon: MapPin },
+    { href: '/recordings', label: 'My recordings', icon: AudioLines },
   ],
   sales: [
     { href: '/calendar', label: 'My calendar', icon: CalendarDays, badge: true },
     { href: '/meetings', label: 'My visits', icon: MapPin },
     { href: '/schools', label: 'My schools', icon: School },
+    { href: '/recordings', label: 'My recordings', icon: AudioLines },
   ],
 };

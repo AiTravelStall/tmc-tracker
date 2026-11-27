@@ -1,7 +1,8 @@
 // Raw Postgres rows (snake_case, loosely typed at the boundary) → typed view models.
 // Components never see database shapes (design doc §8.2).
 import type {
-  Activity, Call, Contact, FollowUp, Meeting, Profile, School, SchoolListItem,
+  Activity, Call, CallRecording, CallRecordingDetail, Contact, FollowUp, Meeting, Profile, School, SchoolListItem,
+  TranscriptSegment,
 } from '@/types/domain';
 
 type Row = Record<string, unknown>;
@@ -84,5 +85,23 @@ export function mapActivity(r: Row): Activity {
   return {
     id: num(r.id), schoolId: numOrNull(r.school_id), schoolName: strOrNull(r.school_name), userName: strOrNull(r.user_name),
     type: str(r.type), message: str(r.message), createdAt: str(r.created_at),
+  };
+}
+
+export function mapCallRecording(r: Row): CallRecording {
+  return {
+    id: str(r.id), userId: strOrNull(r.user_id), userName: strOrNull(r.user_name) ?? (str(r.salestrail_user_name) || null),
+    schoolId: numOrNull(r.school_id), schoolName: strOrNull(r.school_name), contactId: numOrNull(r.contact_id),
+    contactName: strOrNull(r.contact_name), phone: str(r.phone), inbound: Boolean(r.inbound), answered: Boolean(r.answered),
+    startedAt: str(r.started_at), durationSeconds: num(r.duration_seconds),
+    transcriptStatus: r.transcript_status as CallRecording['transcriptStatus'], transcriptLanguage: strOrNull(r.transcript_language),
+  };
+}
+
+export function mapCallRecordingDetail(list: Row, full: Row): CallRecordingDetail {
+  const segments = Array.isArray(full.transcript_segments) ? (full.transcript_segments as TranscriptSegment[]) : [];
+  return {
+    ...mapCallRecording(list), transcript: strOrNull(full.transcript), segments,
+    transcriptProvider: strOrNull(full.transcript_provider), transcriptError: strOrNull(full.transcript_error),
   };
 }

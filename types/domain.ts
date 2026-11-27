@@ -173,3 +173,33 @@ export type MeetingDetail = {
 };
 
 export type Conflict = { id: number; startAt: string; endAt: string; schoolName: string };
+
+export const TRANSCRIPT_STATUSES = ['pending', 'done', 'no_recording', 'skipped', 'failed'] as const;
+export type TranscriptStatus = (typeof TRANSCRIPT_STATUSES)[number];
+
+/** A Salestrail call as listed on the Recordings page and the school page. */
+export type CallRecording = {
+  id: string;
+  userId: string | null;
+  userName: string | null;
+  schoolId: number | null;
+  schoolName: string | null;
+  contactId: number | null;
+  contactName: string | null;
+  phone: string;
+  inbound: boolean;
+  answered: boolean;
+  startedAt: string;
+  durationSeconds: number;
+  transcriptStatus: TranscriptStatus;
+  transcriptLanguage: string | null;
+};
+
+export type TranscriptSegment = { start: number; end: number; text: string };
+
+export type CallRecordingDetail = CallRecording & {
+  transcript: string | null;
+  segments: TranscriptSegment[];
+  transcriptProvider: string | null;
+  transcriptError: string | null;
+};
