@@ -6,14 +6,13 @@ import { requirePageUser } from '@/lib/server/auth';
 import { integrationEnv } from '@/lib/server/env';
 import { lastSyncedAt, listRecordings } from '@/lib/server/data/recordings';
 import { listDirectory } from '@/lib/server/data/users';
-import { fmtDateTime } from '@/lib/shared/format';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { Card, CardHeader } from '@/components/ui/Card';
 import { EmptyState } from '@/components/ui/Feedback';
 import { buttonClass } from '@/components/ui/Button';
 import { PersonFilter } from '@/components/sections/followups/PersonFilter';
 import { RecordingsTable } from '@/components/sections/recordings/RecordingsTable';
-import { SyncButton } from '@/components/sections/recordings/SyncButton';
+import { RefetchButton } from '@/components/sections/recordings/RefetchButton';
 
 export const metadata: Metadata = { title: 'Recordings' };
 const PAGE = 50;
@@ -26,7 +25,7 @@ const querySchema = z.object({
 const SETUP = [
   'In Salestrail, the organisation owner opens callanalytics.salestrail.io/integration/apidocs and generates an API username and password.',
   'Create a free Groq API key at console.groq.com (optional: without it, transcripts use Cloudflare Workers AI only).',
-  'Add SALESTRAIL_API_USERNAME, SALESTRAIL_API_PASSWORD, GROQ_API_KEY and CRON_SECRET as secrets on the tmc-tracker Worker.',
+  'Add SALESTRAIL_API_USERNAME, SALESTRAIL_API_PASSWORD and GROQ_API_KEY as secrets on the tmc-tracker Worker.',
   'Each team member signs in to the Salestrail app with the same email as their tracker login, so calls are linked to them.',
 ];
 
@@ -46,9 +45,9 @@ export default async function RecordingsPage({ searchParams }: { searchParams: P
     <>
       <PageHeader title="Recordings"
         description={isAdmin ? 'Every call made from Salestrail, with its recording and transcript.' : 'Calls made from your phone, with recordings and transcripts.'}
-        actions={isAdmin && connected && <>
-          <PersonFilter people={directory.filter((u) => u.role !== 'admin' || u.id === user.id)} param="user" label="Caller" allLabel="Everyone" />
-          <SyncButton />
+        actions={connected && <>
+          {isAdmin && <PersonFilter people={directory.filter((u) => u.role !== 'admin' || u.id === user.id)} param="user" label="Caller" allLabel="Everyone" />}
+          <RefetchButton lastUpdated={synced} />
         </>} />
 
       {isAdmin && !connected && (
@@ -61,14 +60,13 @@ export default async function RecordingsPage({ searchParams }: { searchParams: P
       <Card flush>
         {!calls.length ? (
           <EmptyState icon={<AudioLines />} title={before ? 'No older calls' : 'No calls yet'}>
-            {connected ? 'New calls show up here within about 10 minutes of being made.' : 'Calls show up here once Salestrail is connected.'}
+            {connected ? 'Press Refetch recordings to bring in calls made since the last update.' : 'Calls show up here once Salestrail is connected.'}
           </EmptyState>
         ) : <RecordingsTable calls={calls} showCaller={isAdmin} />}
-        {(before || older || synced) && (
+        {(before || older) && (
           <div className="flex flex-wrap items-center gap-2 border-t border-tmc-border px-5 py-3 sm:px-6">
             {before && <Link href={person ? `?user=${person}` : '?'} className={buttonClass('ghost', 'sm')}><ChevronsLeft aria-hidden />Newest</Link>}
             {older && <Link href={older} className={buttonClass('outline', 'sm')}>Older<ChevronRight aria-hidden /></Link>}
-            {synced && <span className="ml-auto text-xs text-tmc-slate">Last synced {fmtDateTime(synced)}</span>}
           </div>
         )}
       </Card>

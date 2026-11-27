@@ -8,15 +8,19 @@ import { fetchCallsCreatedBetween, recordingUrl } from './client';
 import { parseCall, type SalestrailCall } from './parse';
 import { transcribe } from './transcribe';
 
-const CURSOR_KEY = 'salestrail.created_cursor';
+export const CURSOR_KEY = 'salestrail.created_cursor';
 const FIRST_SYNC_DAYS = 30;
 const OVERLAP_MS = 30 * 60_000;        // re-read the last 30 min: uploads can land slightly out of order
 const MIN_SECONDS = 5;                 // shorter calls are rings/voicemail: not worth transcribing
 const NO_RECORDING_AFTER_MS = 6 * 3_600_000; // recordings upload after the call; give up after 6 h
 const MAX_ATTEMPTS = 3;
-const TRANSCRIBE_PER_RUN = 4;          // keeps one run well inside Worker time and subrequest limits
+const TRANSCRIBE_PER_RUN = 5;          // keeps one press well inside Worker time and subrequest limits
 
-export type SyncResult = { fetched: number; saved: number; unreadable: number; transcribed: number; noRecording: number; failed: number };
+export type SyncResult = {
+  fetched: number; saved: number; unreadable: number; transcribed: number; noRecording: number; failed: number;
+  /** Recordings still waiting for a transcript: press Refetch again to continue. */
+  waiting: number; syncedAt: string;
+};
 
 type Sb = ReturnType<typeof supabaseAdmin>;
 type Match = { schoolId: number; contactId: number | null };
@@ -108,7 +112,7 @@ async function transcribePending(sb: Sb, cfg: IntegrationEnv) {
   return tally;
 }
 
-/** One sync pass: pull new calls from Salestrail, then transcribe a few waiting recordings. */
+/** One refetch (the Recordings page button): pull new calls from Salestrail, then transcribe a few waiting recordings. */
 export async function runSalestrailSync(): Promise<SyncResult> {
   const cfg = integrationEnv();
   if (!cfg) throw new AppError('NOT_CONFIGURED', 'Salestrail is not connected yet');
@@ -130,7 +134,8 @@ export async function runSalestrailSync(): Promise<SyncResult> {
   if (error) throw new AppError('DB_ERROR', error.message);
 
   const tally = await transcribePending(sb, cfg);
-  const result = { fetched: rows.length, saved, unreadable, ...tally };
+  const { count } = await sb.from('call_recordings').select('id', { count: 'exact', head: true }).eq('transcript_status', 'pending');
+  const result = { fetched: rows.length, saved, unreadable, ...tally, waiting: count ?? 0, syncedAt: to.toISOString() };
   log.info('salestrail sync', result);
   return result;
 }

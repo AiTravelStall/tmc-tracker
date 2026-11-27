@@ -23,7 +23,6 @@ const integrationSchema = z.object({
   SALESTRAIL_API_USERNAME: z.string().min(1),
   SALESTRAIL_API_PASSWORD: z.string().min(1),
   GROQ_API_KEY: z.string().min(1).optional(),
-  CRON_SECRET: z.string().min(24),
 });
 export type IntegrationEnv = z.infer<typeof integrationSchema>;
 

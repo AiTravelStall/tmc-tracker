@@ -27,7 +27,7 @@ async function load(id: string) {
 export const metadata: Metadata = { title: 'Call recording' };
 
 const WAITING: Record<string, string> = {
-  pending: 'The transcript is being prepared. It usually appears within 10–20 minutes of the call.',
+  pending: 'The transcript isn’t ready yet. Press Refetch recordings on the Recordings page to continue transcribing.',
   no_recording: 'Salestrail has no recording for this call. Recording works on Android phones with the Call Recording add-on.',
   skipped: 'This call wasn’t answered (or was only a few seconds), so there is nothing to transcribe.',
   failed: 'The transcript couldn’t be created after several tries.',

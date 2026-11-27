@@ -1,9 +1,10 @@
 import 'server-only';
 import type { CallRecording, CallRecordingDetail } from '@/types/domain';
-import { supabaseForUser } from '../supabase';
+import { supabaseAdmin, supabaseForUser } from '../supabase';
 import { AppError } from '../errors';
 import { unwrap } from './query';
 import { mapCallRecording, mapCallRecordingDetail } from './mappers';
+import { CURSOR_KEY } from '../salestrail/sync';
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -29,9 +30,9 @@ export async function getRecording(id: string): Promise<CallRecordingDetail> {
   return mapCallRecordingDetail(row, unwrap(full) ?? {});
 }
 
-/** When the last sync ran, for the "last synced" note. Null if never (or not visible). */
+/** When recordings were last refetched from Salestrail (by anyone), or null if never. */
 export async function lastSyncedAt(): Promise<string | null> {
-  const sb = await supabaseForUser();
-  const { data } = await sb.from('call_recordings').select('synced_at').order('synced_at', { ascending: false }).limit(1).maybeSingle();
-  return data?.synced_at ?? null;
+  // integration_state is server-only (no API-role grants); reading one timestamp is harmless.
+  const { data } = await supabaseAdmin().from('integration_state').select('updated_at').eq('key', CURSOR_KEY).maybeSingle();
+  return data?.updated_at ?? null;
 }

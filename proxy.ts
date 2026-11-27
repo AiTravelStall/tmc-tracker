@@ -3,8 +3,7 @@ import { createServerClient } from '@supabase/ssr';
 
 // Refreshes the Supabase session cookie on every navigation and does an optimistic
 // redirect for signed-out users. Real authorisation happens in pages, routes and RLS.
-// /api/cron/* has no session: those routes check CRON_SECRET themselves.
-const PUBLIC = ['/login', '/api/auth/login', '/api/health', '/api/cron'];
+const PUBLIC = ['/login', '/api/auth/login', '/api/health'];
 
 export async function proxy(request: NextRequest) {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;

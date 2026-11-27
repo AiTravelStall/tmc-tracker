@@ -1,4 +1,4 @@
-import { bindings, defineConfig, defineWorker, triggers } from "cf/config";
+import { bindings, defineConfig, defineWorker } from "cf/config";
 
 // Workers Builds (CI) sets WORKERS_CI. Locally the secrets are declared so they load from .env.local
 // and missing ones are flagged; in CI they are not, so a fresh Worker can deploy before its secrets exist.
@@ -7,7 +7,7 @@ const declareSecrets = !process.env.WORKERS_CI;
 export default defineConfig({
   worker: defineWorker({
     name: "tmc-tracker",
-    // worker.ts wraps vinext's handler and adds the Salestrail cron.
+    // worker.ts wraps vinext's handler to expose the Workers AI binding to transcription.
     entrypoint: "./worker.ts",
     compatibilityDate: "2026-11-26",
     // nodejs_compat fills process.env from the bindings below, which lib/server/env.ts reads.
@@ -29,10 +29,8 @@ export default defineConfig({
       SALESTRAIL_API_USERNAME: declareSecrets && bindings.secret(),
       SALESTRAIL_API_PASSWORD: declareSecrets && bindings.secret(),
       GROQ_API_KEY: declareSecrets && bindings.secret(),
-      CRON_SECRET: declareSecrets && bindings.secret(),
       AI: bindings.ai(), // Workers AI: free fallback transcription
       NEXT_PUBLIC_APP_TIMEZONE: bindings.text("Asia/Kolkata"),
     },
-    triggers: [triggers.scheduled({ schedule: "*/10 * * * *" })],
   }),
 });
