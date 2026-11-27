@@ -21,7 +21,7 @@ export function TranscriptPlayer({ src, segments, text }: { src: string; segment
   return (
     <div className="flex flex-col gap-5">
       {failed
-        ? <p role="alert" className="rounded-control bg-tmc-error-wash px-4 py-3 text-sm text-tmc-error-ink">The recording couldn&apos;t be loaded from Salestrail. Try again in a moment.</p>
+        ? <p role="alert" className="rounded-control bg-tmc-error-wash px-4 py-3 text-sm text-tmc-error-ink">Salestrail didn&apos;t return a recording for this call. Reload the page to try again; if it keeps happening, check the call in the Salestrail dashboard.</p>
         : <audio ref={audio} src={src} controls preload="none" className="w-full" onTimeUpdate={(e) => setNow(e.currentTarget.currentTime)} onError={() => setFailed(true)} />}
 
       {segments.length > 0 ? (

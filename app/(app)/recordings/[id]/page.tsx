@@ -27,7 +27,7 @@ async function load(id: string) {
 export const metadata: Metadata = { title: 'Call recording' };
 
 const WAITING: Record<string, string> = {
-  pending: 'The transcript isn’t ready yet. Press Refetch recordings on the Recordings page to continue transcribing.',
+  pending: 'Waiting for the recording. Salestrail uploads it from the phone after the call, usually within a few minutes. Once it shows a play button in the Salestrail dashboard, press Refetch recordings. If it never appears, check that call recording is turned on in the Salestrail app.',
   no_recording: 'Salestrail has no recording for this call. Recording works on Android phones with the Call Recording add-on.',
   skipped: 'This call wasn’t answered (or was only a few seconds), so there is nothing to transcribe.',
   failed: 'The transcript couldn’t be created after several tries.',
@@ -63,7 +63,8 @@ export default async function RecordingPage({ params }: Props) {
         <Card aria-labelledby="transcript-title">
           <CardHeader id="transcript-title" icon={<FileText />} title="Recording and transcript"
             description={call.segments.length ? 'Click any line to play from there.' : undefined} />
-          {call.transcriptStatus === 'done' || call.transcriptStatus === 'pending' || call.transcriptStatus === 'failed'
+          {/* Only when Salestrail has audio: done (transcribed) or failed (audio existed but transcription didn't work). */}
+          {call.transcriptStatus === 'done' || call.transcriptStatus === 'failed'
             ? <TranscriptPlayer src={`/api/recordings/${call.id}/audio`} segments={call.segments} text={call.transcript} />
             : null}
           {call.transcriptStatus !== 'done' && (
