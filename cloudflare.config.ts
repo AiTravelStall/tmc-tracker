@@ -12,6 +12,8 @@ export default defineConfig({
     compatibilityDate: "2026-11-26",
     // nodejs_compat fills process.env from the bindings below, which lib/server/env.ts reads.
     compatibilityFlags: ["nodejs_compat"],
+    // Matches the dashboard: no per-version preview URLs (they would expose builds publicly).
+    previewUrls: false,
     assets: {
       htmlHandling: "none",
       notFoundHandling: "none",
